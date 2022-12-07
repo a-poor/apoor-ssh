@@ -1,12 +1,15 @@
 package main
 
 import (
-	"apoor-ssh/pkg/letters"
-	"fmt"
+	"apoor-ssh/pkg/model"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func main() {
-	txt := "hello world"
-	fmt.Println(letters.FormatWord(txt))
-	fmt.Println(txt)
+	m := model.NewModel()
+	app := tea.NewProgram(m, tea.WithAltScreen())
+	if _, err := app.Run(); err != nil {
+		panic(err)
+	}
 }
