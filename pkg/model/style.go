@@ -32,7 +32,8 @@ func fmtNav(w int) string {
 func fmtTitle(t string) string {
 	return lipgloss.NewStyle().
 		Margin(1, 1, 1, 1).
-		Background(lipgloss.Color("#5eb9ff")).
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(lipgloss.Color("#ff5eb9")).
 		Padding(1, 2).
 		Bold(true).
 		Render(t)
@@ -113,5 +114,13 @@ func fmtP(p string, w int) string {
 	return lipgloss.NewStyle().
 		Width(w).
 		MarginBottom(1).
-		Render(p)
+		Render("> " + p)
+}
+
+func fmtLink(link string) string {
+	return lipgloss.NewStyle().
+		Underline(true).
+		Foreground(lipgloss.Color("#5e89ff")).
+		// Faint(true).
+		Render(link)
 }
