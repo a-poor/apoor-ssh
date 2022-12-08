@@ -2,17 +2,26 @@ package model
 
 import "github.com/charmbracelet/lipgloss"
 
-const pageTitle = "ssh.austinpoor.com"
+const pageTitle = "$ ssh ssh.austinpoor.com"
 
-func fmtNav(w int) string {
+func fmtNav(w int, title, user string) string {
 	sLeft := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#ffffff")).
 		Background(lipgloss.Color("#9621a3")).
 		Padding(0, 1).
-		Render("> " + pageTitle)
+		Render(title)
+
+	var sRight string
+	if user != "" {
+		sRight = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#ffffff")).
+			Background(lipgloss.Color("#cf112d")).
+			Padding(0, 1).
+			Render(user)
+	}
 
 	sMiddle := lipgloss.NewStyle().
-		Width(w - lipgloss.Width(sLeft)).
+		Width(w - lipgloss.Width(sLeft) - lipgloss.Width(sRight)).
 		Background(lipgloss.Color("#373b41")).
 		Render("")
 
@@ -21,6 +30,7 @@ func fmtNav(w int) string {
 		lipgloss.Top,
 		sLeft,
 		sMiddle,
+		sRight,
 	)
 
 	// Clip and return...
@@ -51,7 +61,6 @@ func fmtContactKey(s string) string {
 		Background(lipgloss.Color("#b60bd9")).
 		MarginRight(1).
 		MarginBottom(1).
-		// Padding(0, 1).
 		Bold(true).
 		Render("" + s + ":")
 }
@@ -114,13 +123,12 @@ func fmtP(p string, w int) string {
 	return lipgloss.NewStyle().
 		Width(w).
 		MarginBottom(1).
-		Render("> " + p)
+		Render("%> " + p)
 }
 
 func fmtLink(link string) string {
 	return lipgloss.NewStyle().
 		Underline(true).
 		Foreground(lipgloss.Color("#5e89ff")).
-		// Faint(true).
 		Render(link)
 }
