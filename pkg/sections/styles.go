@@ -42,7 +42,7 @@ func FormatSectionHeader(h string, w int) string {
 func FormatSectionDivider(w int) string {
 	// Create the style...
 	style := lipgloss.NewStyle().
-		Margin(1).
+		Margin(2, 0).
 		Align(lipgloss.Center).
 		Width(w)
 

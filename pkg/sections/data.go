@@ -6,14 +6,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var greetingLittle = `# Hi there! I'm Austin!`
-
-var greetingBig = `██╗  ██╗██╗       ██╗███╗   ███╗     █████╗ ██╗   ██╗███████╗████████╗██╗███╗   ██╗██╗
-██║  ██║██║       ██║████╗ ████║    ██╔══██╗██║   ██║██╔════╝╚══██╔══╝██║████╗  ██║██║
-███████║██║       ██║██╔████╔██║    ███████║██║   ██║███████╗   ██║   ██║██╔██╗ ██║██║
-██╔══██║██║       ██║██║╚██╔╝██║    ██╔══██║██║   ██║╚════██║   ██║   ██║██║╚██╗██║╚═╝
-██║  ██║██║▄█╗    ██║██║ ╚═╝ ██║    ██║  ██║╚██████╔╝███████║   ██║   ██║██║ ╚████║██╗
-╚═╝  ╚═╝╚═╝╚═╝    ╚═╝╚═╝     ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   ╚═╝╚═╝  ╚═══╝╚═╝`
+var greeting = `# Hi there! I'm Austin!`
 
 var navTitles = []string{
 	"Hello!",
@@ -26,15 +19,7 @@ var navTitles = []string{
 }
 
 var helloSection = RenderFunc(func(w, h int) string {
-	widthCutoff := 92
-	title := FormatTitle(greetingLittle)
-	if w > widthCutoff {
-		title = lipgloss.NewStyle().
-			Margin(1, 0).
-			Width(w).
-			Render(greetingBig)
-	}
-
+	title := FormatTitle(greeting)
 	div := FormatSectionDivider(w)
 	return lipgloss.JoinVertical(
 		lipgloss.Left,

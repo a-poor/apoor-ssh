@@ -50,7 +50,10 @@ func (m *Model) UpdateContentPos() {
 	}
 
 	// Set the content viewport to the current section...
-	m.Content.VP.YOffset = total
+	m.Content.VP.YOffset = total - section
+	if m.Content.VP.YOffset < 0 {
+		m.Content.VP.YOffset = 0
+	}
 }
 
 func (m *Model) UpdateNavPos() {
@@ -62,8 +65,8 @@ func (m *Model) UpdateNavPos() {
 	var total int
 	for i := 0; i < len(m.Content.Sections); i++ {
 		h := m.Content.GetSectionHeight(i)
-		total += h
-		offset_diff := 2
+		total += h - 1
+		offset_diff := 1
 		if total-offset_diff >= yo {
 			ch = i
 			break
