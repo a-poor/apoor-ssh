@@ -19,6 +19,7 @@ type Content struct {
 	Sections []Renderer
 	VP       *viewport.Model
 	Active   bool
+	Current  int
 }
 
 func NewContent(sections []Renderer) *Content {
@@ -35,46 +36,16 @@ func NewContent(sections []Renderer) *Content {
 
 func (c *Content) Update(msg tea.Msg) (*Content, tea.Cmd) {
 	// Handle the message...
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "right":
-			if !c.Active {
-				c.Active = true
-			}
-		case "left", "esc":
-			if c.Active {
-				c.Active = false
-			}
-		default:
-			if c.Active {
-				*c.VP, _ = c.VP.Update(msg)
-			}
-		}
-
-	case GoToSectionMsg:
-		i := int(msg)
-		var off int
-		for j, s := range c.Sections {
-			if j == i {
-				break
-			}
-			txt := s.Render(c.Width, 0)
-			off += lipgloss.Height(txt)
-		}
-		c.VP.SetYOffset(off)
-	}
-
-	// Update the viewport...
-	if c.Active {
-		vp, err := c.VP.Update(msg)
-		if err != nil {
-			return c, err
-		}
-		c.VP = &vp
-	}
-
+	*c.VP, _ = c.VP.Update(msg)
 	return c, nil
+}
+
+func (c *Content) RenderSection(i int) string {
+	return c.Sections[i].Render(c.Width, 0)
+}
+
+func (c *Content) GetSectionHeight(i int) int {
+	return lipgloss.Height(c.RenderSection(i))
 }
 
 func (c *Content) View() string {
@@ -95,6 +66,16 @@ func (c *Content) View() string {
 		PaddingLeft(2).
 		MaxHeight(c.Height).
 		Render(c.VP.View())
+}
+
+func (c *Content) SetCurrent(i int) {
+	if i >= 0 && i < len(c.Sections) {
+		c.Current = i
+	}
+}
+
+func (c *Content) GetCurrent() int {
+	return c.Current
 }
 
 func (c *Content) SetWidth(w int) {

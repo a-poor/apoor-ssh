@@ -24,6 +24,7 @@ func FormatTitle(title string) string {
 	style := lipgloss.NewStyle().
 		Bold(true).
 		Margin(1).
+		MarginLeft(0).
 		Foreground(titleColor).
 		Underline(true)
 	return style.Render(title)
@@ -41,13 +42,12 @@ func FormatSectionHeader(h string, w int) string {
 func FormatSectionDivider(w int) string {
 	// Create the style...
 	style := lipgloss.NewStyle().
-		Strikethrough(true).
-		Margin(2).
+		Margin(1).
 		Align(lipgloss.Center).
 		Width(w)
 
 	// How many dashes do we need?
-	txt := strings.Repeat("-", 9)
+	txt := strings.Repeat("-", 3)
 
 	// Render and return...
 	return style.Render(txt)
@@ -55,7 +55,8 @@ func FormatSectionDivider(w int) string {
 
 func FormatBody(body string, w int) string {
 	style := lipgloss.NewStyle().
-		Width(w)
+		Width(w).
+		MaxWidth(w)
 	return style.Render(body)
 }
 
@@ -63,4 +64,12 @@ func FormatLink(link string) string {
 	style := lipgloss.NewStyle().
 		Foreground(linkColor)
 	return style.Render(link)
+}
+
+func FormatKeyword(w string) string {
+	style := lipgloss.NewStyle().
+		Italic(true).
+		Foreground(lipgloss.Color("#5eb9ff"))
+	return style.Render(w)
+
 }

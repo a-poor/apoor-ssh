@@ -46,24 +46,14 @@ func (n *Nav) Update(msg tea.Msg) (*Nav, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "up", "k":
-			if n.Active && n.Current > 0 {
+			if n.Current > 0 {
 				n.Current--
 			}
 		case "down", "j":
-			if n.Active && n.Current < len(n.Sections)-1 {
+			if n.Current < len(n.Sections)-1 {
 				n.Current++
 			}
-		case "right":
-			if n.Active {
-				n.Active = false
-			}
-		case "left", "esc":
-			if !n.Active {
-				n.Active = true
-			}
 		}
-	case GoToSectionMsg:
-		n.SetCurrent(int(msg))
 	}
 
 	return n, nil

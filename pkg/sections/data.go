@@ -6,6 +6,15 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+var greetingLittle = `# Hi there! I'm Austin!`
+
+var greetingBig = `██╗  ██╗██╗       ██╗███╗   ███╗     █████╗ ██╗   ██╗███████╗████████╗██╗███╗   ██╗██╗
+██║  ██║██║       ██║████╗ ████║    ██╔══██╗██║   ██║██╔════╝╚══██╔══╝██║████╗  ██║██║
+███████║██║       ██║██╔████╔██║    ███████║██║   ██║███████╗   ██║   ██║██╔██╗ ██║██║
+██╔══██║██║       ██║██║╚██╔╝██║    ██╔══██║██║   ██║╚════██║   ██║   ██║██║╚██╗██║╚═╝
+██║  ██║██║▄█╗    ██║██║ ╚═╝ ██║    ██║  ██║╚██████╔╝███████║   ██║   ██║██║ ╚████║██╗
+╚═╝  ╚═╝╚═╝╚═╝    ╚═╝╚═╝     ╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝   ╚═╝   ╚═╝╚═╝  ╚═══╝╚═╝`
+
 var navTitles = []string{
 	"Hello!",
 	"About Me", // Emoji - 👋
@@ -17,26 +26,38 @@ var navTitles = []string{
 }
 
 var helloSection = RenderFunc(func(w, h int) string {
-	return FormatTitle("# Hi there! I'm Austin!")
+	widthCutoff := 92
+	title := FormatTitle(greetingLittle)
+	if w > widthCutoff {
+		title = lipgloss.NewStyle().
+			Margin(1, 0).
+			Width(w).
+			Render(greetingBig)
+	}
+
+	div := FormatSectionDivider(w)
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		title,
+		div,
+	)
 })
 
 var aboutMeSection = RenderFunc(func(w, h int) string {
 	div := FormatSectionDivider(w)
 	header := FormatSectionHeader("## 👋 About Me", w)
 	rawBody := `Hi, I'm Austin! I'm a software engineer living in Los Angeles, CA. 
-	
-Currently, I work as a full-stack developer at Command Credit -- a business credit reseller in Rhinebeck, NY.
 
 I really enjoy working with data, tackling difficult problems, and designing interfaces to communicate complex ideas.
 
-Some of my favorite technologies and areas-of-interest include Go, TypeScript, Rust, SQL, gRPC, and Machine Learning.`
+Some of my favorite technologies and areas-of-interest include Go, TypeScript, Rust, SQL, gRPC, and ML.`
 	body := FormatBody(rawBody, w)
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		div,
 		header,
 		body,
+		div,
 	)
 })
 
@@ -45,7 +66,26 @@ Some of my favorite technologies and areas-of-interest include Go, TypeScript, R
 // })
 
 var blogSection = RenderFunc(func(w, h int) string {
-	return ""
+	div := FormatSectionDivider(w)
+	header := FormatSectionHeader("## ✏️  Blog", w)
+	rawBody := `I occasionally write some blog posts.
+
+Eventually, I plan to include some info on recent blog posts here.
+
+For now, check out my blog on Medium: %s`
+	body := FormatBody(
+		fmt.Sprintf(
+			rawBody,
+			FormatLink("https://medium.com/@apoor"),
+		),
+		w,
+	)
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		header,
+		body,
+		div,
+	)
 })
 
 var contactMeSection = RenderFunc(func(w, h int) string {
@@ -67,14 +107,13 @@ var contactMeSection = RenderFunc(func(w, h int) string {
 		Italic(true).
 		Background(tagBgColor).
 		Foreground(tagFgColor).
-		MarginRight(1).
-		MarginLeft(2)
+		Padding(0, 1).
+		Margin(0, 1, 1)
 	valStyle := lipgloss.NewStyle().
 		Underline(true).
 		Foreground(linkColor)
 	containerStyle := lipgloss.NewStyle().
-		MaxWidth(w).
-		PaddingLeft(2)
+		MaxWidth(w)
 
 	// Format the body...
 	var parts []string
@@ -94,9 +133,9 @@ var contactMeSection = RenderFunc(func(w, h int) string {
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		div,
 		header,
 		body,
+		div,
 	)
 })
 
@@ -109,7 +148,6 @@ var thisSiteSection = RenderFunc(func(w, h int) string {
 
 You can find the source code here: %s`
 
-	div := FormatSectionDivider(w)
 	header := FormatSectionHeader("## 🛠️  This Site", w)
 
 	body := FormatBody(
@@ -122,7 +160,6 @@ You can find the source code here: %s`
 
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
-		div,
 		header,
 		body,
 	)
