@@ -11,6 +11,7 @@ type Model struct {
 	Nav       *Nav
 	Content   *Content
 	NavActive bool
+	UserName  string
 }
 
 func NewModel() *Model {
@@ -33,6 +34,21 @@ func NewModel() *Model {
 		Nav:     nav,
 		Content: content,
 	}
+}
+
+func (m *Model) WithUserName(name string) *Model {
+	m.UserName = name
+	return m
+}
+
+func (m *Model) WithWidth(width int) *Model {
+	m.Width = width
+	return m
+}
+
+func (m *Model) WithHeight(height int) *Model {
+	m.Height = height
+	return m
 }
 
 func (m *Model) Init() tea.Cmd {
@@ -61,8 +77,8 @@ func (m *Model) UpdateNavPos() {
 	yo := m.Content.VP.YOffset
 
 	// Get the height of each section of content...
-	var ch int
 	var total int
+	ch := len(m.Content.Sections) - 1
 	for i := 0; i < len(m.Content.Sections); i++ {
 		h := m.Content.GetSectionHeight(i)
 		total += h - 1
@@ -119,12 +135,12 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Height = msg.Height
 
 		// Update the nav's max-height...
-		m.Nav.SetHeight(m.Height)
+		m.Nav.SetHeight(m.Height - 1)
 
 		// Update the content's width...
 		nw := lipgloss.Width(m.Nav.View())
 		m.Content.SetWidth(m.Width - nw)
-		m.Content.SetHeight(m.Height)
+		m.Content.SetHeight(m.Height - 1)
 	}
 
 	// Keep going...
@@ -132,10 +148,21 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Model) View() string {
-	return lipgloss.JoinHorizontal(
+	body := lipgloss.JoinHorizontal(
 		lipgloss.Top,
 		m.Nav.View(),
-		// "Hello,\n...\n...world?",
 		m.Content.View(),
+	)
+	body = lipgloss.NewStyle().
+		Height(m.Height - 1).
+		MaxHeight(m.Height - 1).
+		Width(m.Width).
+		Render(body)
+
+	footer := FormatFooter(m.Width, PageTitle, m.UserName)
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		body,
+		footer,
 	)
 }

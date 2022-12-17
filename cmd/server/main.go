@@ -1,7 +1,7 @@
 package main
 
 import (
-	"apoor-ssh/pkg/model"
+	"apoor-ssh/pkg/sections"
 	"context"
 	"flag"
 	"fmt"
@@ -67,10 +67,9 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		return nil, nil
 	}
 
-	m := model.NewModel(model.ModelConf{
-		User:   s.User(),
-		Width:  pty.Window.Width,
-		Height: pty.Window.Height,
-	})
+	m := sections.NewModel().
+		WithUserName(s.User()).
+		WithWidth(pty.Window.Width).
+		WithHeight(pty.Window.Height)
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }
