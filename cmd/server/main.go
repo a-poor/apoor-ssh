@@ -3,7 +3,6 @@ package main
 import (
 	"apoor-ssh/pkg/sections"
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -18,20 +17,25 @@ import (
 	"github.com/gliderlabs/ssh"
 )
 
-var (
-	host = "localhost"
-	port = 23234
+const (
+	defaultHost = "localhost"
+	defaultPort = "23234"
 )
 
-func init() {
-	flag.StringVar(&host, "host", host, "host to connect to")
-	flag.IntVar(&port, "port", port, "port to connect to")
-	flag.Parse()
-}
-
 func main() {
+	// Get the config data
+	host := os.Getenv("APP_HOST")
+	if host == "" {
+		host = defaultHost
+	}
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = defaultPort
+	}
+
+	// Create the server...
 	s, err := wish.NewServer(
-		wish.WithAddress(fmt.Sprintf("%s:%d", host, port)),
+		wish.WithAddress(fmt.Sprintf("%s:%s", host, port)),
 		wish.WithHostKeyPath(".ssh/term_info_ed25519"),
 		wish.WithMiddleware(
 			bm.Middleware(teaHandler),
@@ -42,15 +46,19 @@ func main() {
 		log.Panic(err)
 	}
 
+	// Handle interrupts...
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	log.Printf("Starting SSH server on %s:%d", host, port)
+
+	// Start the server...
+	log.Printf("Starting SSH server on %s:%s", host, port)
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
 			log.Panic(err)
 		}
 	}()
 
+	// Wait for interrupt...
 	<-done
 	log.Println("Shutting down SSH server")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
