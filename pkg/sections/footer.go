@@ -8,7 +8,8 @@ func FormatFooter(w int, title, user string) string {
 	sLeft := lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#ffffff")).
 		Background(lipgloss.Color("#9621a3")).
-		Padding(0, 1).
+		PaddingRight(1).
+		PaddingLeft(2).
 		Render(title)
 
 	u := user

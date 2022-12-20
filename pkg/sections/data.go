@@ -10,12 +10,12 @@ var greeting = `# Hi there! I'm Austin!`
 
 var navTitles = []string{
 	"Hello!",
-	"About Me", // Emoji - 👋
-	// "Projects",  // Emoji - 🚀
-	"Blog",    // Emoji - ✏️
-	"Contact", // Emoji - 📨
-	// "Resume",    // Emoji - 💼
-	"This Site", // Emoji - 🛠️
+	"About Me",
+	"Projects",
+	"Blog",
+	"Contact",
+	"Resume",
+	"This Site",
 }
 
 var helloSection = RenderFunc(func(w, h int) string {
@@ -30,7 +30,7 @@ var helloSection = RenderFunc(func(w, h int) string {
 
 var aboutMeSection = RenderFunc(func(w, h int) string {
 	div := FormatSectionDivider(w)
-	header := FormatSectionHeader("## 👋 About Me", w)
+	header := FormatSectionHeader("## 👋  About Me", w)
 	rawBody := `Hi, I'm Austin! I'm a software engineer living in Los Angeles, CA. 
 
 I really enjoy working with data, tackling difficult problems, and designing interfaces to communicate complex ideas.
@@ -46,13 +46,22 @@ Some of my favorite technologies and areas-of-interest include Go, TypeScript, R
 	)
 })
 
-// var projectsSection = RenderFunc(func(w, h int) string {
-// 	return ""
-// })
+var projectsSection = RenderFunc(func(w, h int) string {
+	div := FormatSectionDivider(w)
+	header := FormatSectionHeader("## 🚀  Projects", w)
+	rawBody := `(Coming soon...)`
+	body := FormatBody(rawBody, w)
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		header,
+		body,
+		div,
+	)
+})
 
 var blogSection = RenderFunc(func(w, h int) string {
 	div := FormatSectionDivider(w)
-	header := FormatSectionHeader("## ✏️  Blog", w)
+	header := FormatSectionHeader("## 👨‍💻  Blog", w)
 	rawBody := `I occasionally write some blog posts.
 
 Eventually, I plan to include some info on recent blog posts here.
@@ -85,7 +94,7 @@ var contactMeSection = RenderFunc(func(w, h int) string {
 
 	// Formatted content...
 	div := FormatSectionDivider(w)
-	header := FormatSectionHeader("## 📨 Contact", w)
+	header := FormatSectionHeader("## 📨  Contact", w)
 
 	// Create the styles...
 	keyStyle := lipgloss.NewStyle().
@@ -124,9 +133,18 @@ var contactMeSection = RenderFunc(func(w, h int) string {
 	)
 })
 
-// var resumeSection = RenderFunc(func(w, h int) string {
-// 	return ""
-// })
+var resumeSection = RenderFunc(func(w, h int) string {
+	div := FormatSectionDivider(w)
+	header := FormatSectionHeader("## 💼  Resume", w)
+	rawBody := `(Coming soon...)`
+	body := FormatBody(rawBody, w)
+	return lipgloss.JoinVertical(
+		lipgloss.Left,
+		header,
+		body,
+		div,
+	)
+})
 
 var thisSiteSection = RenderFunc(func(w, h int) string {
 	rawBody := `I wrote this app with Go, Bubble Tea, and Wish.

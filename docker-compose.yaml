@@ -1,6 +1,15 @@
 version: "3.9"
 services:
-  server:
-    build: .
+  apoor-ssh:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
     ports:
     - 23234:23234
+  vhs:
+    build:
+      context: .
+      dockerfile: Dockerfile.vhs
+    volumes:
+    - ./examples:/vhs/examples
+    

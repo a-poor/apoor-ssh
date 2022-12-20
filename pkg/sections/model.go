@@ -20,10 +20,10 @@ func NewModel() *Model {
 	content := NewContent([]Renderer{
 		helloSection,
 		aboutMeSection,
-		// projectsSection,
+		projectsSection,
 		blogSection,
 		contactMeSection,
-		// resumeSection,
+		resumeSection,
 		thisSiteSection,
 	})
 
@@ -122,12 +122,6 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.UpdateNavPos()
 			}
 		}
-
-		// // Pass the message to the nav...
-		// m.Nav, _ = m.Nav.Update(msg)
-
-		// // Pass the message to the content...
-		// m.Content, _ = m.Content.Update(msg)
 
 	case tea.WindowSizeMsg:
 		// Store the new window size
