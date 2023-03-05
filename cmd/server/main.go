@@ -4,13 +4,13 @@ import (
 	"apoor-ssh/pkg/sections"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/wish"
 	bm "github.com/charmbracelet/wish/bubbletea"
 	lm "github.com/charmbracelet/wish/logging"
@@ -33,17 +33,30 @@ func main() {
 		port = defaultPort
 	}
 
+	// Create the logger...
+	logger := log.New(
+		log.WithOutput(os.Stdout),
+		log.WithLevel(log.DebugLevel),
+		log.WithTimestamp(),
+		log.WithCaller(),
+		log.WithPrefix("apoor-dot-ssh"),
+	)
+	logger.Debug("Starting...")
+
+	// Create the tea handler...
+	teaHandler := makeTeaHandler(logger)
+
 	// Create the server...
+	logger.Debug("Creating SSH server...")
 	s, err := wish.NewServer(
 		wish.WithAddress(fmt.Sprintf("%s:%s", host, port)),
-		// wish.WithHostKeyPath(".ssh/term_info_ed25519"),
 		wish.WithMiddleware(
 			bm.Middleware(teaHandler),
 			lm.Middleware(),
 		),
 	)
 	if err != nil {
-		log.Panic(err)
+		logger.Fatal(err)
 	}
 
 	// Handle interrupts...
@@ -51,33 +64,44 @@ func main() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	// Start the server...
-	log.Printf("Starting SSH server on %s:%s", host, port)
+	logger.Info("Starting SSH server", "host", host, "port", port)
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
-			log.Panic(err)
+			logger.Fatal("ListenAndServe completed.", "err", err)
 		}
 	}()
 
 	// Wait for interrupt...
 	<-done
-	log.Println("Shutting down SSH server")
+	logger.Info("Gracefully shutting down SSH server (with 30s timeout)")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 	if err := s.Shutdown(ctx); err != nil {
-		log.Fatalln(err)
+		log.Fatal("Error from shutdown.", "err", err)
 	}
 }
 
-func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
-	pty, _, active := s.Pty()
-	if !active {
-		wish.Fatalln(s, "no active terminal, skipping")
-		return nil, nil
-	}
+func makeTeaHandler(logger log.Logger) func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+	return func(s ssh.Session) (tea.Model, []tea.ProgramOption) {
+		logger.Debug("New ssh session checking pty...")
+		pty, _, active := s.Pty()
+		logger.Debug(
+			"New ssh session",
+			"term", pty.Term,
+			"active", active,
+		)
+		if !active {
+			logger.Error("No active terminal, skipping")
+			wish.Fatalln(s, "no active terminal, skipping")
+			return nil, nil
+		}
 
-	m := sections.NewModel().
-		WithUserName(s.User()).
-		WithWidth(pty.Window.Width).
-		WithHeight(pty.Window.Height)
-	return m, []tea.ProgramOption{tea.WithAltScreen()}
+		m := sections.NewModel().
+			WithUserName(s.User()).
+			WithWidth(pty.Window.Width).
+			WithHeight(pty.Window.Height).
+			WithLogger(logger)
+
+		return m, []tea.ProgramOption{tea.WithAltScreen()}
+	}
 }

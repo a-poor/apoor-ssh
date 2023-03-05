@@ -1,8 +1,11 @@
 package sections
 
 import (
+	"fmt"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
 )
 
 type Model struct {
@@ -12,6 +15,7 @@ type Model struct {
 	Content   *Content
 	NavActive bool
 	UserName  string
+	Logger    log.Logger
 }
 
 func NewModel() *Model {
@@ -51,7 +55,13 @@ func (m *Model) WithHeight(height int) *Model {
 	return m
 }
 
+func (m *Model) WithLogger(logger log.Logger) *Model {
+	m.Logger = logger
+	return m
+}
+
 func (m *Model) Init() tea.Cmd {
+	m.Logger.Info("Initializing new model...")
 	return nil
 }
 
@@ -94,11 +104,16 @@ func (m *Model) UpdateNavPos() {
 }
 
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.Logger.Debug("Got new message", "msg-type", fmt.Sprintf("%T", msg))
+
 	// Handle the message...
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		m.Logger.Debug("Got key message", "key", msg.String())
+
 		switch msg.String() {
 		case "q", "ctrl+c":
+			m.Logger.Info("Got quit msg. Quitting...")
 			return m, tea.Quit
 
 		case "right":
@@ -124,6 +139,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
+		m.Logger.Debug("Updating window size")
+
 		// Store the new window size
 		m.Width = msg.Width
 		m.Height = msg.Height
@@ -142,6 +159,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *Model) View() string {
+	m.Logger.Debug("Rendering model view")
+
 	body := lipgloss.JoinHorizontal(
 		lipgloss.Top,
 		m.Nav.View(),
@@ -154,6 +173,7 @@ func (m *Model) View() string {
 		Render(body)
 
 	footer := FormatFooter(m.Width, PageTitle, m.UserName)
+
 	return lipgloss.JoinVertical(
 		lipgloss.Left,
 		body,
